@@ -12,11 +12,6 @@ import (
 	"time"
 )
 
-// const (
-// 	mail_userid = "hhyt_devops@163.com"
-// 	mail_pwd    = "ATOLOIEHZIOAWTBC"
-// )
-
 var (
 	longLetters = []byte("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
@@ -52,14 +47,14 @@ func SendMail(sender MailSender, body MailBody) error {
 	//设置邮件
 	mime.WriteString(fmt.Sprintf("From: %s<%s>\r\nTo: %s\r\nCC: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\n",
 		sender.SenderMail, sender.SenderMail, body.To, body.Cc, body.Subject))
-	partid := string(randUp(8))
+	partid := string(randCharacter(8))
 	mime.WriteString(fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s_%s\"\r\n", boundary, partid))
 	mime.WriteString("Content-Type: multipart/alternative;\r\n")
 	mime.WriteString("\r\n\r\nThis is a multi-part message in MIME format.\r\n\r\n")
 	mime.WriteString(fmt.Sprintf("--=====%s_%s=====\r\n", boundary, partid))
 
 	//邮件普通Text正文
-	partid = string(randUp(8))
+	partid = string(randCharacter(8))
 	mime.WriteString(fmt.Sprintf("--=====%s_%s=====\r\n", boundary, partid))
 	mime.WriteString("Content-Type: text/plain; charset=utf-8\r\n")
 	mime.WriteString(body.Text)
@@ -67,7 +62,7 @@ func SendMail(sender MailSender, body MailBody) error {
 	mime.WriteString(fmt.Sprintf("--=====%s_%s=====--\r\n", boundary, partid))
 	// 附件
 	for _, atta := range body.Attas {
-		partid = string(randUp(8))
+		partid = string(randCharacter(8))
 		mime.WriteString(fmt.Sprintf("\n--=====%s_%s=====\r\n", boundary, partid))
 		mime.WriteString("Content-Type: application/octet-stream\r\n")
 		mime.WriteString("Content-Transfer-Encoding: base64\r\n")
@@ -93,7 +88,7 @@ func SendMail(sender MailSender, body MailBody) error {
 	return smtp.SendMail(sender.SmtpServer, auth, sender.SenderMail, sendTo, mime.Bytes())
 }
 
-func randUp(length int) []byte {
+func randCharacter(length int) []byte {
 	if length <= 0 {
 		return []byte{}
 	}
